@@ -36,7 +36,7 @@ const Select: FC<ISelectProps> = ({
   disabled = false,
   onSelect,
   allowSearch = true,
-  bgClassName = 'bg-gray-100',
+  bgClassName = 'bg-transparent',
 }) => {
   const [query, setQuery] = useState('')
   const [open, setOpen] = useState(false)
