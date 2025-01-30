@@ -1,7 +1,7 @@
 import type { FC } from 'react'
 import classNames from 'classnames'
+import { Option } from 'lucide-react'
 import style from './style.module.css'
-
 export type AppIconProps = {
   size?: 'xs' | 'tiny' | 'small' | 'medium' | 'large'
   rounded?: boolean
@@ -28,7 +28,7 @@ const AppIcon: FC<AppIconProps> = ({
         background,
       }}
     >
-      🤖
+      <Option />
     </span>
   )
 }

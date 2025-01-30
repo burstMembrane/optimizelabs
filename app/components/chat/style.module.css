@@ -19,7 +19,7 @@
 
 
 .questionIcon {
-  background: url(./icons/default-avatar.jpg);
+  background: url(./icons/circle-user-round.png);
   background-size: contain;
   border-radius: 50%;
 }
