@@ -38,6 +38,7 @@
     "immer": "^9.0.19",
     "js-cookie": "^3.0.1",
     "katex": "^0.16.7",
+    "lucide-react": "^0.474.0",
     "negotiator": "^0.6.3",
     "next": "^14.0.4",
     "rc-textarea": "^1.5.3",

@@ -2,10 +2,10 @@ import React from 'react'
 import type { FC } from 'react'
 import { useTranslation } from 'react-i18next'
 import {
-  ChatBubbleOvalLeftEllipsisIcon,
   PencilSquareIcon,
 } from '@heroicons/react/24/outline'
-import { ChatBubbleOvalLeftEllipsisIcon as ChatBubbleOvalLeftEllipsisSolidIcon } from '@heroicons/react/24/solid'
+// import chat buttons from lucide-react
+import { MessageCircle, MessageCircleDashed } from 'lucide-react'
 import Button from '@/app/components/base/button'
 // import Card from './card'
 import type { ConversationItem } from '@/types/app'
@@ -48,7 +48,7 @@ const Sidebar: FC<ISidebarProps> = ({
         {list.map((item) => {
           const isCurrent = item.id === currentId
           const ItemIcon
-            = isCurrent ? ChatBubbleOvalLeftEllipsisSolidIcon : ChatBubbleOvalLeftEllipsisIcon
+            = isCurrent ? MessageCircle : MessageCircleDashed
           return (
             <div
               onClick={() => onCurrentIdChange(item.id)}
