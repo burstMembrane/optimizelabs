@@ -417,10 +417,14 @@ const Main: FC<IMainProps> = () => {
 
         if (isNewConversationIdChanged()) {
           console.log("Updating conversation list")
+          // print the conversation content
+
           const { data: allConversations }: any = await fetchConversations()
+          console.log(allConversations[0])
           const newItem: any = await generateConversationName(allConversations[0].id)
           console.log("New conversation name: ", newItem)
           const updatedConversations = produce(allConversations, (draft: any) => {
+
             draft[0].name = newItem.name
           })
           setConversationList(updatedConversations as any)

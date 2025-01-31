@@ -56,9 +56,8 @@ const Sidebar: FC<ISidebarProps> = ({
               <ItemIcon
                 className={classNames(
                   isCurrent
-                    ? 'text-primary-600'
-                    : 'text-gray-400 group-hover:text-gray-500',
-                  'mr-3 h-5 w-5 flex-shrink-0',
+                    ? 'text-primary-600 mr-2'
+                    : 'hidden',
                 )}
                 aria-hidden="true"
               />
