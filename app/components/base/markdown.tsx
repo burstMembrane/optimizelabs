@@ -13,7 +13,7 @@ export function Markdown(props: { content: string }) {
     <div className="markdown-body">
       <ReactMarkdown
         remarkPlugins={[RemarkGfm, RemarkBreaks]}
-        rehypePlugins={[RehypeKatex, RehypeRaw]} // Add rehypeRaw here
+        rehypePlugins={[RehypeRaw]} // Add rehypeRaw here
         components={{
           code({ node, inline, className, children, ...props }) {
             const match = /language-(\w+)/.exec(className || '')
