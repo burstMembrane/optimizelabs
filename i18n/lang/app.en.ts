@@ -10,6 +10,9 @@ const translation = {
     openingStatementTitle: 'Opening statement',
     powerBy: 'Powered by',
     prompt: 'Prompt',
+    placeholder: {
+      input: 'Ask me anything about automating your business...',
+    },
     privatePromptConfigTitle: 'Conversation settings',
     publicPromptConfigTitle: 'Initial Prompt',
     configStatusDes: 'Before you start, you can configure the conversation settings.',

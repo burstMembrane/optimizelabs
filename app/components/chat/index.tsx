@@ -3,17 +3,14 @@ import type { FC } from 'react'
 import React, { useEffect, useRef } from 'react'
 import cn from 'classnames'
 import { useTranslation } from 'react-i18next'
-import Textarea from 'rc-textarea'
-import s from './style.module.css'
+
+import { ChatInput } from './chat-input'
 import Answer from './answer'
 import Question from './question'
 import type { FeedbackFunc } from './type'
 import type { ChatItem, VisionFile, VisionSettings } from '@/types/app'
 import { TransferMethod } from '@/types/app'
-import Tooltip from '@/app/components/base/tooltip'
 import Toast from '@/app/components/base/toast'
-import ChatImageUploader from '@/app/components/base/image-uploader/chat-image-uploader'
-import ImageList from '@/app/components/base/image-uploader/image-list'
 import { useImageFiles } from '@/app/components/base/image-uploader/hooks'
 
 export type IChatProps = {
@@ -144,64 +141,52 @@ const Chat: FC<IChatProps> = ({
         })}
       </div>
       {
-        !isHideSendInput && (
-          <div className={cn(!feedbackDisabled && '!left-3.5 !right-3.5', 'absolute z-10 bottom-0 left-0 right-0')}>
-            <div className='p-[5.5px] max-h-[150px] bg-background rounded-xl overflow-y-auto'>
-              {
-                visionConfig?.enabled && (
-                  <>
-                    <div className='absolute bottom-2 left-2 flex items-center'>
-                      <ChatImageUploader
-                        settings={visionConfig}
-                        onUpload={onUpload}
-                        disabled={files.length >= visionConfig.number_limits}
-                      />
-                      <div className='mx-1 w-[1px] h-4 bg-muted' />
-                    </div>
-                    <div className='pl-[52px]'>
-                      <ImageList
-                        list={files}
-                        onRemove={onRemove}
-                        onReUpload={onReUpload}
-                        onImageLinkLoadSuccess={onImageLinkLoadSuccess}
-                        onImageLinkLoadError={onImageLinkLoadError}
-                      />
-                    </div>
-                  </>
-                )
-              }
-              <Textarea
-                className={cn(
-                  "flex min-h-12 w-full px-3 py-3 rounded-2xl text-sm rounded-md border border-gray-300 drop-shadow-xl",
-                  "ring-offset-background placeholder:text-muted-foreground focus-visible:outline-none  ",
-                  "disabled:cursor-not-allowed disabled:opacity-50 resize-none",
-                  "pr-[118px]",
-                  visionConfig?.enabled && "pl-12"
-                )}
-                value={query}
-                onChange={handleContentChange}
-                onKeyUp={handleKeyUp}
-                onKeyDown={handleKeyDown}
-                autoSize
-              />
-              <div className="absolute bottom-3.5 right-4 flex items-center h-8">
-                {/* <div className="mr-4 h-5 leading-5 text-sm bg-muted text-muted-foreground px-2 rounded">{query.trim().length}</div> */}
-                <Tooltip
-                  selector='send-tip'
-                  htmlContent={
-                    <div>
-                      <div>{t('common.operation.send')} Enter</div>
-                      <div>{t('common.operation.lineBreak')} Shift Enter</div>
-                    </div>
-                  }
-                >
-                  <div className={`${s.sendBtn} w-8 h-8  cursor-pointer rounded-md`} onClick={handleSend}></div>
-                </Tooltip>
-              </div>
-            </div>
-          </div>
-        )
+        <MessageBox
+          t={t}
+          feedbackDisabled={feedbackDisabled}
+          query={query}
+          handleContentChange={handleContentChange}
+          handleKeyUp={handleKeyUp}
+          handleKeyDown={handleKeyDown}
+          handleSend={handleSend}
+        />
       }
+    </div>
+  )
+}
+
+function MessageBox({
+  t,
+  feedbackDisabled,
+  query,
+  handleContentChange,
+  handleKeyUp,
+  handleKeyDown,
+  handleSend,
+}: {
+  t: Function
+  feedbackDisabled: boolean
+  query: string
+  handleContentChange: (e: any) => void
+  handleKeyUp: (e: any) => void
+  handleKeyDown: (e: any) => void
+  handleSend: () => void
+}) {
+  return (
+    <div className='!left-4 !right-4 absolute z-10 bottom-0 bg-none'>
+      <div className='max-h-[150px] rounded-2xl shadow-lg'>
+        <ChatInput
+          placeholder={t('app.chat.placeholder.input')}
+          className='border-2 border-gray-200 bg-gray-100'
+          value={query}
+          onChange={handleContentChange}
+          onKeyUp={handleKeyUp}
+          onKeyDown={handleKeyDown}
+        />
+        <div className="absolute bottom-3.5 right-4 flex items-center h-8">
+
+        </div>
+      </div>
     </div>
   )
 }
