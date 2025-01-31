@@ -38,7 +38,7 @@ const Main: FC<IMainProps> = () => {
   const [appUnavailable, setAppUnavailable] = useState<boolean>(false)
   const [isUnknownReason, setIsUnknownReason] = useState<boolean>(false)
   const [promptConfig, setPromptConfig] = useState<PromptConfig | null>(null)
-  const [inited, setInited] = useState<boolean>(false)
+  const [initialized, setInitialized] = useState<boolean>(false)
   // in mobile, show sidebar by click button
   const [isShowSidebar, { setTrue: showSidebar, setFalse: hideSidebar }] = useBoolean(false)
   const [visionConfig, setVisionConfig] = useState<VisionSettings | undefined>({
@@ -81,25 +81,13 @@ const Main: FC<IMainProps> = () => {
     setExistConversationInfo,
   } = useConversation()
 
-  const [conversationIdChangeBecauseOfNew, setConversationIdChangeBecauseOfNew, getConversationIdChangeBecauseOfNew] = useGetState(false)
+  const [conversationIdChangeBecauseOfNew, setConversationIdChanged, getConversationIdChangeBecauseOfNew] = useGetState(false)
   const [isChatStarted, { setTrue: setChatStarted, setFalse: setChatNotStarted }] = useBoolean(true)
-  const handleStartChat = (inputs: Record<string, any>) => {
-    createNewChat()
-    setConversationIdChangeBecauseOfNew(true)
-    setCurrInputs(inputs)
-    setChatStarted()
-    // parse variables in introduction
-    setChatList(generateNewChatListWithOpenStatement('', inputs))
-  }
-  const hasSetInputs = (() => {
-    return isChatStarted
-  })()
 
-  const conversationName = currConversationInfo?.name || t('app.chat.newChatDefaultName') as string
   const conversationIntroduction = currConversationInfo?.introduction || ''
 
   const handleConversationSwitch = () => {
-    if (!inited)
+    if (!initialized)
       return
 
     // update inputs of current conversation
@@ -150,19 +138,21 @@ const Main: FC<IMainProps> = () => {
     if (isNewConversation && isChatStarted)
       setChatList(generateNewChatListWithOpenStatement())
   }
-  useEffect(handleConversationSwitch, [currConversationId, inited])
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  useEffect(handleConversationSwitch, [currConversationId, initialized])
 
   const handleConversationIdChange = (id: string) => {
     if (id === '-1') {
       createNewChat()
-      setConversationIdChangeBecauseOfNew(true)
+      setConversationIdChanged(true)
     }
     else {
-      setConversationIdChangeBecauseOfNew(false)
+      setConversationIdChanged(false)
     }
     // trigger handleConversationSwitch
     setCurrConversationId(id, APP_ID)
-    hideSidebar()
+    // fix: why did we hide the sidebar here?
+    // hideSidebar()
   }
 
   /*
@@ -176,7 +166,6 @@ const Main: FC<IMainProps> = () => {
       chatListDomRef.current.scrollTop = chatListDomRef.current.scrollHeight
   }, [chatList, currConversationId])
   // user can not edit inputs if user had send message
-  const canEditInputs = !chatList.some(item => item.isAnswer === false) && isNewConversation
   const createNewChat = () => {
     // if new chat is already exist, do not create new chat
     if (conversationList.some(item => item.id === '-1'))
@@ -227,7 +216,6 @@ const Main: FC<IMainProps> = () => {
         if (error) {
           Toast.notify({ type: 'error', message: error })
           throw new Error(error)
-          return
         }
         const _conversationId = getConversationIdFromStorage(APP_ID)
         const isNotNewConversation = conversations.some(item => item.id === _conversationId)
@@ -253,7 +241,7 @@ const Main: FC<IMainProps> = () => {
         if (isNotNewConversation)
           setCurrConversationId(_conversationId, APP_ID, false)
 
-        setInited(true)
+        setInitialized(true)
       }
       catch (e: any) {
         if (e.status === 404) {
@@ -265,10 +253,11 @@ const Main: FC<IMainProps> = () => {
         }
       }
     })()
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [])
 
   const [isResponding, { setTrue: setRespondingTrue, setFalse: setRespondingFalse }] = useBoolean(false)
-  const [abortController, setAbortController] = useState<AbortController | null>(null)
+  const [_abortController, setAbortController] = useState<AbortController | null>(null)
   const { notify } = Toast
   const logError = (message: string) => {
     notify({ type: 'error', message })
@@ -292,9 +281,10 @@ const Main: FC<IMainProps> = () => {
     return true
   }
 
-  const [messageTaskId, setMessageTaskId] = useState('')
-  const [hasStopResponded, setHasStopResponded, getHasStopResponded] = useGetState(false)
-  const [isRespondingConIsCurrCon, setIsRespondingConCurrCon, getIsRespondingConIsCurrCon] = useGetState(true)
+  const [_messageTaskId, setMessageTaskId] = useState('')
+  // TODO: implement this
+  const [_hasStopResponded, _setHasStopResponded, _getHasStopResponded] = useGetState(false)
+  const [_isRespondingConIsCurrCon, setIsRespondingConCurrCon, _getIsRespondingConIsCurrCon] = useGetState(true)
 
   const updateCurrentQA = ({
     responseItem,
@@ -424,7 +414,7 @@ const Main: FC<IMainProps> = () => {
           })
           setConversationList(newAllConversations as any)
         }
-        setConversationIdChangeBecauseOfNew(false)
+        setConversationIdChanged(false)
         resetNewConversationInputs()
         setChatNotStarted()
         setCurrConversationId(tempNewConversationId, APP_ID, true)
