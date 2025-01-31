@@ -4,7 +4,7 @@ import RemarkMath from 'remark-math'
 import RemarkBreaks from 'remark-breaks'
 import RehypeKatex from 'rehype-katex'
 import RemarkGfm from 'remark-gfm'
-import rehypeRaw from 'rehype-raw' // Import rehype-raw
+import RehypeRaw from 'rehype-raw'
 import SyntaxHighlighter from 'react-syntax-highlighter'
 import { atelierHeathLight } from 'react-syntax-highlighter/dist/esm/styles/hljs'
 
@@ -12,8 +12,8 @@ export function Markdown(props: { content: string }) {
   return (
     <div className="markdown-body">
       <ReactMarkdown
-        remarkPlugins={[RemarkGfm, RemarkBreaks, RemarkMath]}
-        rehypePlugins={[RehypeKatex, rehypeRaw]} // Add rehypeRaw here
+        remarkPlugins={[RemarkGfm, RemarkBreaks]}
+        rehypePlugins={[RehypeKatex, RehypeRaw]} // Add rehypeRaw here
         components={{
           code({ node, inline, className, children, ...props }) {
             const match = /language-(\w+)/.exec(className || '')
