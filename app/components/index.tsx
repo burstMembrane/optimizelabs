@@ -27,6 +27,7 @@ export type IMainProps = {
 }
 
 const Main: FC<IMainProps> = () => {
+  // todo: move these to a hook
   const { t } = useTranslation()
   const media = useBreakpoints()
   const isMobile = media === MediaType.mobile
@@ -39,7 +40,7 @@ const Main: FC<IMainProps> = () => {
   const [isUnknownReason, setIsUnknownReason] = useState<boolean>(false)
   const [promptConfig, setPromptConfig] = useState<PromptConfig | null>(null)
   const [initialized, setInitialized] = useState<boolean>(false)
-  // in mobile, show sidebar by click button
+  // show sidebar by click button
   const [isShowSidebar, { setTrue: showSidebar, setFalse: hideSidebar }] = useBoolean(false)
   const [visionConfig, setVisionConfig] = useState<VisionSettings | undefined>({
     enabled: false,

@@ -1,13 +1,9 @@
 import React from 'react'
 import type { FC } from 'react'
 import { useTranslation } from 'react-i18next'
-import {
-  PencilSquareIcon,
-} from '@heroicons/react/24/outline'
+
 // import chat buttons from lucide-react
 import { MessageCircle, MessageCircleDashed } from 'lucide-react'
-import Button from '@/app/components/base/button'
-
 import type { ConversationItem } from '@/types/app'
 
 function classNames(...classes: any[]) {
@@ -36,11 +32,7 @@ const Sidebar: FC<ISidebarProps> = ({
     >
       {list.length < MAX_CONVERSATION_LENGTH && (
         <div className="flex flex-shrink-0 p-4 !pb-0">
-          <Button
-            onClick={() => { onCurrentIdChange('-1') }}
-            className="group block w-full flex-shrink-0 !justify-start !h-9 text-primary-600 items-center text-sm">
-            <PencilSquareIcon className="mr-2 h-4 w-4" /> {t('app.chat.newChat')}
-          </Button>
+
         </div>
       )}
 
@@ -83,3 +75,4 @@ const Sidebar: FC<ISidebarProps> = ({
 }
 
 export default React.memo(Sidebar)
+

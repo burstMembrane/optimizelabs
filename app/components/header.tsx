@@ -3,6 +3,8 @@ import React from 'react'
 import { Bars3Icon } from '@heroicons/react/24/solid'
 import { Cog, PanelLeft, SquarePen } from 'lucide-react'
 
+import { NewChatButton } from '@/app/components/new-chat-button'
+
 // Types
 type HeaderProps = {
   title: string
@@ -46,7 +48,7 @@ const Header: FC<HeaderProps> = ({
   title,
   isMobile,
   onShowSideBar,
-  onCreateNewChat,
+  onCreateNewChat = () => { },
 }) => {
   const SidebarButton = () => {
     if (isMobile) {
@@ -56,15 +58,18 @@ const Header: FC<HeaderProps> = ({
           iconClassName={STYLE.icon}
           onShowSideBar={onShowSideBar}
         />
+
       )
     }
 
     return (
-      <div>
+      <div className='flex items-center space-x-2'>
         <PanelLeft
           onClick={() => onShowSideBar?.()}
           className={`h-6 w-6 ${STYLE.icon} cursor-pointer`}
         />
+        <NewChatButton handleNewChat={onCreateNewChat} />
+
       </div>
     )
   }
@@ -78,25 +83,24 @@ const Header: FC<HeaderProps> = ({
     </div>
   )
 
-  const NewChatButton = () => {
-    if (!isMobile)
-      return null
+  // const NewChatButton = () => {
+  //   if (!isMobile)
+  //     return null
 
-    return (
-      <div
-        className={STYLE.mobileButton}
-        onClick={() => onCreateNewChat?.()}
-      >
-        <SquarePen className={`h-4 w-4 ${STYLE.icon}`} />
-      </div>
-    )
-  }
+  //   return (
+  //     <div
+  //       className={STYLE.mobileButton}
+  //       onClick={() => onCreateNewChat?.()}
+  //     >
+  //       <SquarePen className={`h-4 w-4 ${STYLE.icon}`} />
+  //     </div>
+  //   )
+  // }
 
   return (
     <div className={STYLE.header}>
       {SidebarButton()}
       {AppInfo()}
-      {NewChatButton()}
     </div>
   )
 }
