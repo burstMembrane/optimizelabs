@@ -185,7 +185,7 @@ function MessageBox({
       <div className='max-h-[200px]  shadow-lg relative'>
         <ChatInput
           placeholder={t('app.chat.placeholder.input')}
-          className='border-2 h-16 bg-gray-100 rounded-2xl pr-12 outline-none focus:outline-none text-lg'
+          className='border-2 h-16 bg-gray-100 rounded-2xl pr-12 outline-none focus:outline-none text-xl'
           value={query}
           onChange={handleContentChange}
           onKeyUp={handleKeyUp}
