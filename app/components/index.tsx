@@ -41,7 +41,7 @@ const Main: FC<IMainProps> = () => {
   const [promptConfig, setPromptConfig] = useState<PromptConfig | null>(null)
   const [initialized, setInitialized] = useState<boolean>(false)
   // show sidebar by click button
-  const [isShowSidebar, { setTrue: showSidebar, setFalse: hideSidebar }] = useBoolean(false)
+  const [isShowSidebar, { setTrue: showSidebar, setFalse: hideSidebar }] = useBoolean(true)
   const [visionConfig, setVisionConfig] = useState<VisionSettings | undefined>({
     enabled: false,
     number_limits: 2,
@@ -582,19 +582,25 @@ const Main: FC<IMainProps> = () => {
     setChatList(newChatList)
     notify({ type: 'success', message: t('common.api.success') })
   }
-
+  function toggleSidebar() {
+    console.log(`toggleSidebar: isShowSidebar: ${isShowSidebar}`)
+    isShowSidebar ? hideSidebar() : showSidebar()
+  }
   const renderSidebar = () => {
     if (!APP_ID || !APP_INFO || !promptConfig)
       return null
     return (
-      <Sidebar
-        list={conversationList}
-        onCurrentIdChange={handleConversationIdChange}
-        currentId={currConversationId}
-        copyRight={APP_INFO.copyright || APP_INFO.title}
-      />
+      <div className={`transition-transform duration-300 ease-in-out ${isShowSidebar ? 'translate-x-0' : '-translate-x-full'} shadow-lg`}>
+        <Sidebar
+          list={conversationList}
+          onCurrentIdChange={handleConversationIdChange}
+          currentId={currConversationId}
+          copyRight={APP_INFO.copyright || APP_INFO.title}
+        />
+      </div>
     )
   }
+
 
   if (appUnavailable)
     return <AppUnavailable isUnknownReason={isUnknownReason} errMessage={!hasSetAppConfig ? 'Please set APP_ID and API_KEY in config/index.tsx' : ''} />
@@ -605,10 +611,9 @@ const Main: FC<IMainProps> = () => {
   return (
     <div className='bg-transparent '>
       <Header
-
         title={APP_INFO.title}
         isMobile={isMobile}
-        onShowSideBar={showSidebar}
+        onShowSideBar={toggleSidebar}
         onCreateNewChat={() => handleConversationIdChange('-1')}
       />
       <div className="flex rounded-2xl bg-white overflow-hidden">

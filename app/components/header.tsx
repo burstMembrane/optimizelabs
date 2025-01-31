@@ -4,6 +4,7 @@ import { Bars3Icon } from '@heroicons/react/24/solid'
 import { Cog, PanelLeft, SquarePen } from 'lucide-react'
 
 import { NewChatButton } from '@/app/components/new-chat-button'
+import { on } from 'events'
 
 // Types
 type HeaderProps = {
@@ -23,7 +24,7 @@ type MobileSidebarButtonProps = {
 const STYLE = {
   icon: 'text-gray-500',
   mobileButton: 'flex items-center justify-center h-8 w-8 cursor-pointer',
-  header: 'shrink-0 flex items-center justify-between h-12 px-3  bg-transparent border-gray-200 border-b-1 ',
+  header: 'shrink-0 flex items-center justify-between h-12 px-3 bg-transparent border-gray-300 border-b-1 shadow-lg shadow-bottom',
   appInfo: {
     wrapper: 'flex items-center space-x-2 absolute left-1/2 -translate-x-1/2',
     title: 'text-xl text-gray-800 font-bold',
@@ -65,7 +66,7 @@ const Header: FC<HeaderProps> = ({
     return (
       <div className='flex items-center space-x-2'>
         <PanelLeft
-          onClick={() => onShowSideBar?.()}
+          onClick={onShowSideBar}
           className={`h-6 w-6 ${STYLE.icon} cursor-pointer`}
         />
         <NewChatButton handleNewChat={onCreateNewChat} />
@@ -82,20 +83,6 @@ const Header: FC<HeaderProps> = ({
       </div>
     </div>
   )
-
-  // const NewChatButton = () => {
-  //   if (!isMobile)
-  //     return null
-
-  //   return (
-  //     <div
-  //       className={STYLE.mobileButton}
-  //       onClick={() => onCreateNewChat?.()}
-  //     >
-  //       <SquarePen className={`h-4 w-4 ${STYLE.icon}`} />
-  //     </div>
-  //   )
-  // }
 
   return (
     <div className={STYLE.header}>
