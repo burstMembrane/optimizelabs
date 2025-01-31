@@ -9,7 +9,7 @@ import useConversation from '@/hooks/use-conversation'
 import Toast from '@/app/components/base/toast'
 import Sidebar from '@/app/components/sidebar'
 import Header from '@/app/components/header'
-import { fetchAppParams, fetchChatList, fetchConversations, generationConversationName, sendChatMessage, updateFeedback } from '@/service'
+import { fetchAppParams, fetchChatList, fetchConversations, generateConversationName, sendChatMessage, updateFeedback } from '@/service'
 import type { ChatItem, ConversationItem, Feedbacktype, PromptConfig, VisionFile, VisionSettings } from '@/types/app'
 import { Resolution, TransferMethod, WorkflowRunningStatus } from '@/types/app'
 import Chat from '@/app/components/chat'
@@ -82,7 +82,7 @@ const Main: FC<IMainProps> = () => {
     setExistConversationInfo,
   } = useConversation()
 
-  const [conversationIdChangeBecauseOfNew, setConversationIdChanged, getConversationIdChangeBecauseOfNew] = useGetState(false)
+  const [conversationIdChanged, setConversationIdChanged, isNewConversationIdChanged] = useGetState(false)
   const [isChatStarted, { setTrue: setChatStarted, setFalse: setChatNotStarted }] = useBoolean(true)
 
   const conversationIntroduction = currConversationInfo?.introduction || ''
@@ -110,7 +110,7 @@ const Main: FC<IMainProps> = () => {
     }
 
     // update chat list of current conversation
-    if (!isNewConversation && !conversationIdChangeBecauseOfNew && !isResponding) {
+    if (!isNewConversation && !conversationIdChanged && !isResponding) {
       fetchChatList(currConversationId).then((res: any) => {
         const { data } = res
         const newChatList: ChatItem[] = generateNewChatListWithOpenStatement(notSyncToStateIntroduction, notSyncToStateInputs)
@@ -186,8 +186,18 @@ const Main: FC<IMainProps> = () => {
   const generateNewChatListWithOpenStatement = (introduction?: string, inputs?: Record<string, any> | null) => {
     let calculatedIntroduction = introduction || conversationIntroduction || ''
     const calculatedPromptVariables = inputs || currInputs || null
+
     if (calculatedIntroduction && calculatedPromptVariables)
       calculatedIntroduction = replaceVarWithValues(calculatedIntroduction, promptConfig?.prompt_variables || [], calculatedPromptVariables)
+
+    // Add a default AI greeting message
+    const aiGreetingMessage = {
+      id: `greeting-${Date.now()}`,
+      content: t('app.chat.greeting'),
+      isAnswer: true,
+      feedbackDisabled: true,
+      isOpeningStatement: true,
+    }
 
     const openStatement = {
       id: `${Date.now()}`,
@@ -196,10 +206,9 @@ const Main: FC<IMainProps> = () => {
       feedbackDisabled: true,
       isOpeningStatement: isShowPrompt,
     }
-    if (calculatedIntroduction)
-      return [openStatement]
 
-    return []
+    // Ensure AI greeting is always first
+    return [aiGreetingMessage, ...(calculatedIntroduction ? [openStatement] : [])]
   }
 
   // init
@@ -257,7 +266,7 @@ const Main: FC<IMainProps> = () => {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [])
 
-  const [isResponding, { setTrue: setRespondingTrue, setFalse: setRespondingFalse }] = useBoolean(false)
+  const [isResponding, { setTrue: enableResponding, setFalse: setRespondingFalse }] = useBoolean(false)
   const [_abortController, setAbortController] = useState<AbortController | null>(null)
   const { notify } = Toast
   const logError = (message: string) => {
@@ -282,10 +291,10 @@ const Main: FC<IMainProps> = () => {
     return true
   }
 
-  const [_messageTaskId, setMessageTaskId] = useState('')
+  const messageTaskIdRef = useRef('')
   // TODO: implement this
   const [_hasStopResponded, _setHasStopResponded, _getHasStopResponded] = useGetState(false)
-  const [_isRespondingConIsCurrCon, setIsRespondingConCurrCon, _getIsRespondingConIsCurrCon] = useGetState(true)
+  const [_isRespondingConIsCurrCon, setIsRespondingInCurrentConversation, _getIsRespondingConIsCurrCon] = useGetState(true)
 
   const updateCurrentQA = ({
     responseItem,
@@ -367,7 +376,7 @@ const Main: FC<IMainProps> = () => {
     const prevTempNewConversationId = getCurrConversationId() || '-1'
     let tempNewConversationId = ''
 
-    setRespondingTrue()
+    enableResponding()
     sendChatMessage(data, {
       getAbortController: (abortController) => {
         setAbortController(abortController)
@@ -389,10 +398,10 @@ const Main: FC<IMainProps> = () => {
         if (isFirstMessage && newConversationId)
           tempNewConversationId = newConversationId
 
-        setMessageTaskId(taskId)
+        messageTaskIdRef.current = taskId
         // has switched to other conversation
         if (prevTempNewConversationId !== getCurrConversationId()) {
-          setIsRespondingConCurrCon(false)
+          setIsRespondingInCurrentConversation(false)
           return
         }
         updateCurrentQA({
@@ -406,14 +415,15 @@ const Main: FC<IMainProps> = () => {
         if (hasError)
           return
 
-        if (getConversationIdChangeBecauseOfNew()) {
+        if (isNewConversationIdChanged()) {
+          console.log("Updating conversation list")
           const { data: allConversations }: any = await fetchConversations()
-          const newItem: any = await generationConversationName(allConversations[0].id)
-
-          const newAllConversations = produce(allConversations, (draft: any) => {
+          const newItem: any = await generateConversationName(allConversations[0].id)
+          console.log("New conversation name: ", newItem)
+          const updatedConversations = produce(allConversations, (draft: any) => {
             draft[0].name = newItem.name
           })
-          setConversationList(newAllConversations as any)
+          setConversationList(updatedConversations as any)
         }
         setConversationIdChanged(false)
         resetNewConversationInputs()
@@ -458,7 +468,7 @@ const Main: FC<IMainProps> = () => {
         }
         // has switched to other conversation
         if (prevTempNewConversationId !== getCurrConversationId()) {
-          setIsRespondingConCurrCon(false)
+          setIsRespondingInCurrentConversation(false)
           return false
         }
 

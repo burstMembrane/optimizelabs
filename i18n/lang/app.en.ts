@@ -9,6 +9,7 @@ const translation = {
     newChatDefaultName: 'New Chat',
     openingStatementTitle: 'Opening statement',
     powerBy: 'Powered by',
+    greeting: `Hi there! I’m your AI assistant from Optimize Labs, here to help you find the best AI tools to streamline your business.Let’s start with a few quick questions—what’s your business type, and what areas would you like to automate? I’ll recommend the best tools tailored to your needs!`,
     prompt: 'Prompt',
     placeholder: {
       input: 'Ask me anything about automating your business...',
