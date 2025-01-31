@@ -174,16 +174,16 @@ function MessageBox({
 }) {
   return (
     <div className='!left-4 !right-4 absolute z-10 bottom-0 bg-none'>
-      <div className='max-h-[150px] rounded-2xl shadow-lg'>
+      <div className='max-h-[200px] shadow-lg'>
         <ChatInput
           placeholder={t('app.chat.placeholder.input')}
-          className='border-2 border-gray-200 bg-gray-100'
+          className='border-2 h-16 bg-gray-100  rounded-2xl'
           value={query}
           onChange={handleContentChange}
           onKeyUp={handleKeyUp}
           onKeyDown={handleKeyDown}
         />
-        <div className="absolute bottom-3.5 right-4 flex items-center h-8">
+        <div className="absolute bottom-5 right-4 flex items-center h-8">
 
         </div>
       </div>

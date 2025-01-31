@@ -21,7 +21,7 @@ type MobileSidebarButtonProps = {
 const STYLE = {
   icon: 'text-gray-500',
   mobileButton: 'flex items-center justify-center h-8 w-8 cursor-pointer',
-  header: 'shrink-0 flex items-center justify-between h-12 px-3',
+  header: 'shrink-0 flex items-center justify-between h-12 px-3  bg-transparent border-gray-200 border-b-1 ',
   appInfo: {
     wrapper: 'flex items-center space-x-2 absolute left-1/2 -translate-x-1/2',
     title: 'text-xl text-gray-800 font-bold',

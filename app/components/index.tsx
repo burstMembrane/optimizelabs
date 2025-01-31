@@ -612,8 +612,9 @@ const Main: FC<IMainProps> = () => {
     return <Loading type='app' />
 
   return (
-    <div className='bg-transparent border-b border-black'>
+    <div className='bg-transparent '>
       <Header
+
         title={APP_INFO.title}
         isMobile={isMobile}
         onShowSideBar={showSidebar}
