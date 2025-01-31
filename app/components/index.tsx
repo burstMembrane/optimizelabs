@@ -8,8 +8,8 @@ import { useBoolean, useGetState } from 'ahooks'
 import useConversation from '@/hooks/use-conversation'
 import Toast from '@/app/components/base/toast'
 import Sidebar from '@/app/components/sidebar'
-import ConfigSence from '@/app/components/config-scence'
 import Header from '@/app/components/header'
+import Config from '@/app/components/config'
 import { fetchAppParams, fetchChatList, fetchConversations, generationConversationName, sendChatMessage, updateFeedback } from '@/service'
 import type { ChatItem, ConversationItem, Feedbacktype, PromptConfig, VisionFile, VisionSettings } from '@/types/app'
 import { Resolution, TransferMethod, WorkflowRunningStatus } from '@/types/app'
@@ -52,7 +52,7 @@ const Main: FC<IMainProps> = () => {
   useEffect(() => {
     if (APP_INFO?.title)
       document.title = `${APP_INFO.title}`
-  }, [APP_INFO?.title])
+  }, [])
 
   // onData change thought (the produce obj). https://github.com/immerjs/immer/issues/576
   useEffect(() => {
@@ -93,8 +93,6 @@ const Main: FC<IMainProps> = () => {
     setChatList(generateNewChatListWithOpenStatement('', inputs))
   }
   const hasSetInputs = (() => {
-
-
     return isChatStarted
   })()
 
@@ -295,12 +293,9 @@ const Main: FC<IMainProps> = () => {
     return true
   }
 
-  const [controlFocus, setControlFocus] = useState(0)
-  const [openingSuggestedQuestions, setOpeningSuggestedQuestions] = useState<string[]>([])
   const [messageTaskId, setMessageTaskId] = useState('')
   const [hasStopResponded, setHasStopResponded, getHasStopResponded] = useGetState(false)
   const [isRespondingConIsCurrCon, setIsRespondingConCurrCon, getIsRespondingConIsCurrCon] = useGetState(true)
-  const [userQuery, setUserQuery] = useState('')
 
   const updateCurrentQA = ({
     responseItem,
@@ -640,7 +635,7 @@ const Main: FC<IMainProps> = () => {
         )}
         {/* main */}
         <div className='flex-grow flex flex-col h-[calc(100vh_-_3rem)] overflow-y-auto'>
-          <ConfigSence
+          <Config
             conversationName={conversationName}
             hasSetInputs={hasSetInputs}
             isPublicVersion={isShowPrompt}
@@ -650,7 +645,7 @@ const Main: FC<IMainProps> = () => {
             canEditInputs={canEditInputs}
             savedInputs={currInputs as Record<string, any>}
             onInputsChange={setCurrInputs}
-          ></ConfigSence>
+          ></Config>
 
           {
             hasSetInputs && (
