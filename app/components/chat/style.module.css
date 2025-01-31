@@ -22,13 +22,6 @@
 }
 
 .answer::before,
-.question::before {
-  content: '';
-  position: absolute;
-  top: 0;
-  width: 8px;
-  height: 12px;
-}
 
 .answer::before {
   left: 0;
