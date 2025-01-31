@@ -159,7 +159,7 @@ const Welcome: FC<IWelcomeProps> = ({
     if (isPublicVersion) {
       return (
         <div>
-          <AppInfoComp siteInfo={siteInfo} />
+          {/* <AppInfoComp siteInfo={siteInfo} /> */}
           <TemplateVarPanel
             isFold={false}
             header={
