@@ -92,7 +92,7 @@ const Answer: FC<IAnswerProps> = ({
     return (
       <Tooltip
         selector={`user-feedback-${randomString(16)}`}
-        content={isLike ? '取消赞同' : '取消反对'}
+        content={isLike ? 'Like' : 'Dislike'}
       >
         <div
           className={'relative box-border flex items-center justify-center h-7 w-7 p-0.5 rounded-lg bg-white cursor-pointer text-gray-500 hover:text-gray-800'}
@@ -177,7 +177,7 @@ const Answer: FC<IAnswerProps> = ({
         </div>
         <div className={`${s.answerWrap}`}>
           <div className={`${s.answer} relative text-sm text-gray-900`}>
-            <div className={`py-3 px-4 bg-gray-100 rounded-2xl  ${workflowProcess && 'min-w-[480px]'}`}>
+            <div className={`py-3 px-4  max-w-[1200px] min-w-[480px] rounded-2xl  ${workflowProcess && 'min-w-[480px]'}`}>
               {workflowProcess && (
                 <WorkflowProcess data={workflowProcess} hideInfo />
               )}

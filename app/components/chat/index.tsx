@@ -4,6 +4,8 @@ import React, { useEffect, useRef } from 'react'
 import cn from 'classnames'
 import { useTranslation } from 'react-i18next'
 
+import { Send } from 'lucide-react'
+import Button from '../base/button'
 import { ChatInput } from './chat-input'
 import Answer from './answer'
 import Question from './question'
@@ -42,7 +44,7 @@ const Chat: FC<IChatProps> = ({
   useCurrentUserAvatar,
   isResponding,
   controlClearQuery,
-  visionConfig,
+
 }) => {
   const { t } = useTranslation()
   const { notify } = Toast
@@ -142,6 +144,7 @@ const Chat: FC<IChatProps> = ({
       </div>
       {
         <MessageBox
+          isHideSendInput={isHideSendInput}
           t={t}
           feedbackDisabled={feedbackDisabled}
           query={query}
@@ -149,6 +152,7 @@ const Chat: FC<IChatProps> = ({
           handleKeyUp={handleKeyUp}
           handleKeyDown={handleKeyDown}
           handleSend={handleSend}
+          isResponding={isResponding}
         />
       }
     </div>
@@ -156,34 +160,46 @@ const Chat: FC<IChatProps> = ({
 }
 
 function MessageBox({
+  isHideSendInput,
   t,
   feedbackDisabled,
   query,
+  isResponding = false,
   handleContentChange,
   handleKeyUp,
   handleKeyDown,
   handleSend,
 }: {
   t: Function
+  isHideSendInput: boolean
   feedbackDisabled: boolean
   query: string
+  isResponding?: boolean
   handleContentChange: (e: any) => void
   handleKeyUp: (e: any) => void
   handleKeyDown: (e: any) => void
   handleSend: () => void
 }) {
   return (
-    <div className='!left-4 !right-4 absolute z-10 bottom-0 bg-none'>
-      <div className='max-h-[200px] shadow-lg'>
+    <div className='!left-4 !right-4 absolute z-10 bottom-2 bg-none '>
+      <div className='max-h-[200px]  shadow-lg relative'>
         <ChatInput
           placeholder={t('app.chat.placeholder.input')}
-          className='border-2 h-16 bg-gray-100  rounded-2xl'
+          className='border-2 h-16 bg-gray-100 rounded-2xl pr-12 outline-none focus:outline-none text-lg'
           value={query}
           onChange={handleContentChange}
           onKeyUp={handleKeyUp}
           onKeyDown={handleKeyDown}
         />
-        <div className="absolute bottom-5 right-4 flex items-center h-8">
+        <div className="absolute inset-y-0 right-1 flex items-center">
+          <Button
+            className={`${query ? 'cursor-pointer' : 'cursor-not-allowed opacity-50'} text-gray-500`}
+            onClick={query ? handleSend : undefined}
+            disabled={isHideSendInput || feedbackDisabled}
+          >
+            {/* {isResponding ? <StopCircle className='w-8 h-8' /> : <Send className='w-8 h-8' />} */}
+            <Send className='w-8 h-8' />
+          </Button>
 
         </div>
       </div>
