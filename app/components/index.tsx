@@ -182,13 +182,12 @@ const Main: FC<IMainProps> = () => {
     }))
   }
 
-  // sometime introduction is not applied to state
-  const generateNewChatListWithOpenStatement = (introduction?: string, inputs?: Record<string, any> | null) => {
-    let calculatedIntroduction = introduction || conversationIntroduction || ''
-    const calculatedPromptVariables = inputs || currInputs || null
+  const generateNewChatListWithOpenStatement = (introduction, inputs) => {
+    let calculatedIntroduction = introduction || conversationIntroduction || '';
+    const calculatedPromptVariables = inputs || currInputs || null;
 
     if (calculatedIntroduction && calculatedPromptVariables)
-      calculatedIntroduction = replaceVarWithValues(calculatedIntroduction, promptConfig?.prompt_variables || [], calculatedPromptVariables)
+      calculatedIntroduction = replaceVarWithValues(calculatedIntroduction, promptConfig?.prompt_variables || [], calculatedPromptVariables);
 
     // Add a default AI greeting message
     const aiGreetingMessage = {
@@ -197,19 +196,21 @@ const Main: FC<IMainProps> = () => {
       isAnswer: true,
       feedbackDisabled: true,
       isOpeningStatement: true,
-    }
+      belongsTo: 'assistant' // Ensure the message is marked as an assistant response
+    };
 
-    const openStatement = {
+    const openingStatement = {
       id: `${Date.now()}`,
       content: calculatedIntroduction,
       isAnswer: true,
       feedbackDisabled: true,
       isOpeningStatement: isShowPrompt,
-    }
+      belongsTo: 'assistant' // Mark as assistant response as well
+    };
 
     // Ensure AI greeting is always first
-    return [aiGreetingMessage, ...(calculatedIntroduction ? [openStatement] : [])]
-  }
+    return [aiGreetingMessage, ...(calculatedIntroduction ? [openingStatement] : [])];
+  };
 
   // init
   useEffect(() => {
