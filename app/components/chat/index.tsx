@@ -195,7 +195,7 @@ function MessageBox({
           <Button
             className={`${query ? 'cursor-pointer' : 'cursor-not-allowed opacity-50'} text-gray-500`}
             onClick={query ? handleSend : undefined}
-            disabled={isHideSendInput || feedbackDisabled}
+            disabled={isHideSendInput || feedbackDisabled || isResponding}
           >
             {/* {isResponding ? <StopCircle className='w-8 h-8' /> : <Send className='w-8 h-8' />} */}
             <Send className='w-8 h-8' />
