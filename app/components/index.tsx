@@ -109,11 +109,14 @@ const Main: FC<IMainProps> = () => {
       setCurrInputs(notSyncToStateInputs)
     }
 
-    // update chat list of current conversation
+    // For ongoing conversation, get the latest chat list
     if (!isNewConversation && !conversationIdChanged && !isResponding) {
       fetchChatList(currConversationId).then((res: any) => {
         const { data } = res
         const newChatList: ChatItem[] = generateNewChatListWithOpenStatement(notSyncToStateIntroduction, notSyncToStateInputs)
+
+        // Clear the current chat list
+        setChatList([])
 
         data.forEach((item: any) => {
           newChatList.push({
@@ -135,26 +138,19 @@ const Main: FC<IMainProps> = () => {
         setChatList(newChatList)
       })
     }
-
-    if (isNewConversation && isChatStarted)
-      setChatList(generateNewChatListWithOpenStatement())
+    // For new conversation, the UI was already cleared in handleConversationIdChange.
   }
   // eslint-disable-next-line react-hooks/exhaustive-deps
   useEffect(handleConversationSwitch, [currConversationId, initialized])
 
   const handleConversationIdChange = (id: string) => {
     if (id === '-1') {
-      createNewChat()
-      setConversationIdChanged(true)
+      createNewChat();
+      // Immediately clear UI and set opening statement for new conversation
+      setChatList(generateNewChatListWithOpenStatement());
     }
-    else {
-      setConversationIdChanged(false)
-    }
-    // trigger handleConversationSwitch
-    setCurrConversationId(id, APP_ID)
-    // fix: why did we hide the sidebar here?
-    // hideSidebar()
-  }
+    setCurrConversationId(id, APP_ID);
+  };
 
   /*
   * chat info. chat is under conversation.
