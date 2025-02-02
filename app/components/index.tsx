@@ -667,7 +667,7 @@ ${conversationSummary}`
         )}
         {/* main */}
         <div className='flex-grow flex flex-col h-[calc(100vh_-_3rem)] overflow-y-auto w-100vw'>
-          <div className='relative w-full max-w-[1200px] flex-1 mobile:w-full pb-[66px] mx-auto mb-3.5'>
+          <div className='relative w-full max-w-[1200px] flex-1 mobile:w-full pb-[66px] mx-auto mb-3.5 overflow-y-auto'>
             <div className='h-full overflow-y-auto' ref={chatListDomRef}>
               <Chat
                 chatList={chatList}
