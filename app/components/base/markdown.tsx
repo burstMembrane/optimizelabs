@@ -1,8 +1,6 @@
 import ReactMarkdown from 'react-markdown'
 import 'katex/dist/katex.min.css'
-import RemarkMath from 'remark-math'
 import RemarkBreaks from 'remark-breaks'
-import RehypeKatex from 'rehype-katex'
 import RemarkGfm from 'remark-gfm'
 import RehypeRaw from 'rehype-raw'
 import SyntaxHighlighter from 'react-syntax-highlighter'
@@ -36,7 +34,7 @@ export function Markdown(props: { content: string }) {
           },
         }}
         linkTarget={'_blank'}
-        allowDangerousHtml // Required for rehypeRaw to work
+      // allowDangerousHtml // Required for rehypeRaw to work
       >
         {props.content}
       </ReactMarkdown>

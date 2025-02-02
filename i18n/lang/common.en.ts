@@ -3,6 +3,8 @@ const translation = {
     success: 'Success',
     saved: 'Saved',
     create: 'Created',
+    update: 'Updated',
+    delete: 'Deleted',
   },
   operation: {
     confirm: 'Confirm',

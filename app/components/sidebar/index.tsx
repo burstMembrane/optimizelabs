@@ -3,7 +3,7 @@ import type { FC } from 'react'
 import { useTranslation } from 'react-i18next'
 
 // import chat buttons from lucide-react
-import { MessageCircle, MessageCircleDashed } from 'lucide-react'
+import { MessageCircle, MessageCircleDashed, Trash } from 'lucide-react'
 import type { ConversationItem } from '@/types/app'
 
 function classNames(...classes: any[]) {
@@ -16,7 +16,7 @@ export type ISidebarProps = {
   copyRight: string
   currentId: string
   onCurrentIdChange: (id: string) => void
-
+  deleteConversation: (id: string) => void
   list: ConversationItem[]
 }
 
@@ -24,6 +24,7 @@ const Sidebar: FC<ISidebarProps> = ({
   copyRight,
   currentId,
   onCurrentIdChange,
+  deleteConversation,
   list,
 }) => {
   const { t } = useTranslation()
@@ -38,6 +39,7 @@ const Sidebar: FC<ISidebarProps> = ({
       )}
 
       <nav className="mt-4 flex-1 space-y-1 bg-white p-4 !pt-0">
+        <p className="text-gray-400 text-xs px-2 font-normal">{t('conversations')}</p>
         {list.map((item) => {
           const isCurrent = item.id === currentId
           const ItemIcon
@@ -48,20 +50,20 @@ const Sidebar: FC<ISidebarProps> = ({
               key={item.id}
               className={classNames(
                 isCurrent
-                  ? 'bg-primary-50 text-primary-600'
-                  : 'text-gray-700 hover:bg-gray-100 hover:text-gray-700',
+                  ? 'bg-gray-200 text-primary-600'
+                  : 'text-gray-700 hover:text-gray-700 hover:bg-gray-200',
                 'group flex items-center rounded-md px-2 py-2 text-sm font-medium cursor-pointer',
               )}
-            >
-              <ItemIcon
+            > <p className='text-ellipsis'>{item.name}</p>
+              <Trash
+                onClick={(e) => {
+                  e.stopPropagation()
+                  deleteConversation(item.id)
+                }}
                 className={classNames(
-                  isCurrent
-                    ? 'text-primary-600 mr-2'
-                    : 'hidden',
+                  'text-gray-200 ml-auto h-4 w-4 hidden group-hover:block group-hover:text-gray-400 hover:text-gray-800'
                 )}
-                aria-hidden="true"
-              />
-              {item.name}
+                aria-hidden="true" />
             </div>
           )
         })}
