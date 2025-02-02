@@ -1,8 +1,6 @@
 import React from 'react'
 import type { FC } from 'react'
 import { useTranslation } from 'react-i18next'
-
-// import chat buttons from lucide-react
 import { MessageCircle, MessageCircleDashed } from 'lucide-react'
 import type { ConversationItem } from '@/types/app'
 
@@ -16,7 +14,6 @@ export type ISidebarProps = {
   copyRight: string
   currentId: string
   onCurrentIdChange: (id: string) => void
-
   list: ConversationItem[]
 }
 
@@ -29,14 +26,8 @@ const Sidebar: FC<ISidebarProps> = ({
   const { t } = useTranslation()
   return (
     <div
-      className="h-full flex flex-col overflow-y-auto bg-white pc:w-[244px] tablet:w-[192px] mobile:w-[240px]  border-r border-gray-200 tablet:h-[calc(100vh_-_3rem)] mobile:h-screen"
+      className="h-full flex flex-col overflow-y-auto bg-white w-[244px] border-r border-gray-200 tablet:h-[calc(100vh_-_3rem)] mobile:h-screen"
     >
-      {list.length < MAX_CONVERSATION_LENGTH && (
-        <div className="flex flex-shrink-0 p-4 !pb-0">
-
-        </div>
-      )}
-
       <nav className="mt-4 flex-1 space-y-1 bg-white p-4 !pt-0">
         {list.map((item) => {
           const isCurrent = item.id === currentId
@@ -50,18 +41,11 @@ const Sidebar: FC<ISidebarProps> = ({
                 isCurrent
                   ? 'bg-primary-50 text-primary-600'
                   : 'text-gray-700 hover:bg-gray-100 hover:text-gray-700',
-                'group flex items-center rounded-md px-2 py-2 text-sm font-medium cursor-pointer',
+                'group select-none flex items-center rounded-md px-2 py-2 text-sm font-medium cursor-pointer truncate',
               )}
             >
-              <ItemIcon
-                className={classNames(
-                  isCurrent
-                    ? 'text-primary-600 mr-2'
-                    : 'hidden',
-                )}
-                aria-hidden="true"
-              />
-              {item.name}
+
+              <span className="truncate">{item.name}</span>
             </div>
           )
         })}

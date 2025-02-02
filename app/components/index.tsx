@@ -113,7 +113,7 @@ const Main: FC<IMainProps> = () => {
     if (!isNewConversation && !conversationIdChanged && !isResponding) {
       fetchChatList(currConversationId).then((res: any) => {
         const { data } = res
-        const newChatList: ChatItem[] = generateNewChatListWithOpenStatement(notSyncToStateIntroduction, notSyncToStateInputs)
+        const newChatList: ChatItem[] = generateNewChatListWithOpenStatement(notSyncToStateIntroduction, notSyncToStateInputs || {})
 
         // Clear the current chat list
         setChatList([])
@@ -147,7 +147,7 @@ const Main: FC<IMainProps> = () => {
     if (id === '-1') {
       createNewChat();
       // Immediately clear UI and set opening statement for new conversation
-      setChatList(generateNewChatListWithOpenStatement());
+      setChatList(generateNewChatListWithOpenStatement('', currInputs || {}));
     }
     setCurrConversationId(id, APP_ID);
   };
@@ -178,7 +178,7 @@ const Main: FC<IMainProps> = () => {
     }))
   }
 
-  const generateNewChatListWithOpenStatement = (introduction, inputs) => {
+  const generateNewChatListWithOpenStatement = (introduction: string, inputs: Record<string, any>) => {
     let calculatedIntroduction = introduction || conversationIntroduction || '';
     const calculatedPromptVariables = inputs || currInputs || null;
 
