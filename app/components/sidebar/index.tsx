@@ -31,17 +31,16 @@ const Sidebar: FC<ISidebarProps> = ({
       <nav className="mt-4 flex-1 space-y-1 bg-white p-4 !pt-0">
         {list.map((item) => {
           const isCurrent = item.id === currentId
-          const ItemIcon
-            = isCurrent ? MessageCircle : MessageCircleDashed
+
           return (
             <div
               onClick={() => onCurrentIdChange(item.id)}
               key={item.id}
               className={classNames(
                 isCurrent
-                  ? 'bg-primary-50 text-primary-600'
+                  ? 'bg-gray-200 text-primary-600 font-bold'
                   : 'text-gray-700 hover:bg-gray-100 hover:text-gray-700',
-                'group select-none flex items-center rounded-md px-2 py-2 text-sm font-medium cursor-pointer truncate',
+                'group select-none flex items-center px-2 py-2 text-sm font-medium cursor-pointer truncate',
               )}
             >
 
