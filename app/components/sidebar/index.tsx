@@ -1,7 +1,6 @@
 import React from 'react'
 import type { FC } from 'react'
 import { useTranslation } from 'react-i18next'
-import { MessageCircle, MessageCircleDashed } from 'lucide-react'
 import type { ConversationItem } from '@/types/app'
 
 function classNames(...classes: any[]) {

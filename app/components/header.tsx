@@ -27,7 +27,7 @@ const STYLE = {
   header: 'shrink-0 flex items-center justify-between h-12 px-3 bg-transparent border-gray-300 border-b-1 shadow-lg shadow-bottom',
   appInfo: {
     wrapper: 'flex items-center space-x-2 absolute left-1/2 -translate-x-1/2',
-    title: 'text-xl text-gray-800 font-bold',
+    title: 'text-xl text-gray-800 font-bold select-none',
   },
 } as const
 

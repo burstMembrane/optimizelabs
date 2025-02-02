@@ -49,6 +49,10 @@ const Main: FC<IMainProps> = () => {
     transfer_methods: [TransferMethod.local_file],
   })
 
+  // Add these near the other state declarations
+  const [messageCounter, setMessageCounter] = useState<number>(0)
+  const MESSAGES_BEFORE_RENAME = 2 // You can adjust this number as needed
+
   useEffect(() => {
     if (APP_INFO?.title)
       document.title = `${APP_INFO.title}`
@@ -412,16 +416,33 @@ const Main: FC<IMainProps> = () => {
         if (hasError)
           return
 
-        if (isNewConversationIdChanged()) {
+        // Update message counter and check if we should generate new name
+        const newMessageCount = messageCounter + 1
+        setMessageCounter(newMessageCount)
+
+        if (newMessageCount >= MESSAGES_BEFORE_RENAME) {
           console.log("Updating conversation list")
-          // print the conversation content
-
           const { data: allConversations }: any = await fetchConversations()
-          console.log(allConversations[0])
-          const newItem: any = await generateConversationName(allConversations[0].id)
-          console.log("New conversation name: ", newItem)
-          const updatedConversations = produce(allConversations, (draft: any) => {
 
+          // Extract conversation content from chatList
+          const conversationSummary = chatList
+            .filter(msg => !msg.isOpeningStatement) // Skip opening statements
+            .map(msg => ({
+              role: msg.isAnswer ? 'assistant' : 'user',
+              content: msg.content || (msg.agent_thoughts?.[0]?.thought || '')
+            }))
+            .filter(msg => msg.content) // Remove empty messages
+            .slice(-MESSAGES_BEFORE_RENAME) // Take last 6 messages for context
+            .map(msg => `${msg.role}: ${msg.content}`)
+            .join('\n')
+
+          // Create prompt for name generation
+          const prompt = `Based on this conversation about a business, generate a brief, relevant conversation name (max 40 chars):
+
+${conversationSummary}`
+
+          const newItem: any = await generateConversationName(allConversations[0].id, prompt)
+          const updatedConversations = produce(allConversations, (draft: any) => {
             draft[0].name = newItem.name
           })
           setConversationList(updatedConversations as any)
@@ -601,7 +622,7 @@ const Main: FC<IMainProps> = () => {
     if (!APP_ID || !APP_INFO || !promptConfig)
       return null
     return (
-      <div className={`transition-transform duration-300 ease-in-out ${isShowSidebar ? 'translate-x-0' : '-translate-x-full'} shadow-lg`}>
+      <div className={`slide-out-to-left duration-300 ease-in-out ${isShowSidebar ? 'translate-x-0' : '-translate-x-full hidden  '} shadow-lg`}>
         <Sidebar
           list={conversationList}
           onCurrentIdChange={handleConversationIdChange}
@@ -612,6 +633,10 @@ const Main: FC<IMainProps> = () => {
     )
   }
 
+  // Add this to reset message counter when conversation changes
+  useEffect(() => {
+    setMessageCounter(0)
+  }, [currConversationId])
 
   if (appUnavailable)
     return <AppUnavailable isUnknownReason={isUnknownReason} errMessage={!hasSetAppConfig ? 'Please set APP_ID and API_KEY in config/index.tsx' : ''} />
@@ -641,8 +666,8 @@ const Main: FC<IMainProps> = () => {
           </div>
         )}
         {/* main */}
-        <div className='flex-grow flex flex-col h-[calc(100vh_-_3rem)] overflow-y-autow-full'>
-          <div className='relative w-full max-w-[1200px]  grow h-[200px]  mobile:w-full pb-[66px] mx-auto mb-3.5 overflow-hidden'>
+        <div className='flex-grow flex flex-col h-[calc(100vh_-_3rem)] overflow-y-auto w-100vw'>
+          <div className='relative w-full max-w-[1200px] flex-1 mobile:w-full pb-[66px] mx-auto mb-3.5'>
             <div className='h-full overflow-y-auto' ref={chatListDomRef}>
               <Chat
                 chatList={chatList}
