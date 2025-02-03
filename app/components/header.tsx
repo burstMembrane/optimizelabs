@@ -2,9 +2,11 @@ import type { FC } from 'react'
 import React from 'react'
 import { Bars3Icon } from '@heroicons/react/24/solid'
 import { Cog, PanelLeft, SquarePen } from 'lucide-react'
+import Image from 'next/image'
 
 import { NewChatButton } from '@/app/components/new-chat-button'
 import { on } from 'events'
+import Logo from '@/app/components/base/logo/logo.svg'
 
 // Types
 type HeaderProps = {
@@ -77,10 +79,7 @@ const Header: FC<HeaderProps> = ({
 
   const AppInfo = () => (
     <div className={STYLE.appInfo.wrapper}>
-      <Cog className={`h-6 w-6 ${STYLE.icon}`} />
-      <div className={STYLE.appInfo.title}>
-        {title}
-      </div>
+      <Image src={Logo} alt="Logo" className="h-8 w-auto" />
     </div>
   )
 
