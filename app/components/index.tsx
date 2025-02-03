@@ -51,7 +51,7 @@ const Main: FC<IMainProps> = () => {
 
   // Add these near the other state declarations
   const [messageCounter, setMessageCounter] = useState<number>(0)
-  const MESSAGES_BEFORE_RENAME = 2 // You can adjust this number as needed
+  const MESSAGES_BEFORE_RENAME = 3 // You can adjust this number as needed
 
   useEffect(() => {
     if (APP_INFO?.title)
