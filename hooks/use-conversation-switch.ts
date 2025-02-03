@@ -2,6 +2,7 @@ import { useEffect } from 'react'
 import { fetchChatList } from '@/service'
 import type { ChatItem } from '@/types/app'
 import { addFileInfos, sortAgentSorts } from '@/utils/tools'
+import { useQuery } from '@tanstack/react-query'
 
 interface UseConversationSwitchProps {
     initialized: boolean
@@ -30,6 +31,15 @@ export const useConversationSwitch = ({
     generateNewChatListWithOpenStatement,
     setChatList,
 }: UseConversationSwitchProps) => {
+    const { data: chatListData } = useQuery({
+        queryKey: ['chatList', currConversationId],
+        queryFn: () => fetchChatList(currConversationId),
+        enabled: initialized && !isNewConversation && !conversationIdChanged && !isResponding,
+        staleTime: 10000,
+        refetchInterval: 10000,
+
+    })
+
     useEffect(() => {
         if (!initialized)
             return
@@ -53,34 +63,31 @@ export const useConversationSwitch = ({
             setCurrInputs(notSyncToStateInputs)
         }
 
-        // For ongoing conversation, get the latest chat list
-        if (!isNewConversation && !conversationIdChanged && !isResponding) {
-            fetchChatList(currConversationId).then((res: any) => {
-                const { data } = res
-                const newChatList: ChatItem[] = generateNewChatListWithOpenStatement(notSyncToStateIntroduction, notSyncToStateInputs || {})
+        // Process chat list data when available
+        if (chatListData) {
+            const { data } = chatListData
+            const newChatList: ChatItem[] = generateNewChatListWithOpenStatement(notSyncToStateIntroduction, notSyncToStateInputs || {})
 
-                // Clear the current chat list
-                setChatList([])
+            // Clear the current chat list
+            setChatList([])
 
-                data.forEach((item: any) => {
-                    newChatList.push({
-                        id: `question-${item.id}`,
-                        content: item.query,
-                        isAnswer: false,
-                        message_files: item.message_files?.filter((file: any) => file.belongs_to === 'user') || [],
-                    })
-                    newChatList.push({
-                        id: item.id,
-                        content: item.answer,
-                        agent_thoughts: addFileInfos(item.agent_thoughts ? sortAgentSorts(item.agent_thoughts) : item.agent_thoughts, item.message_files),
-                        feedback: item.feedback,
-                        isAnswer: true,
-                        message_files: item.message_files?.filter((file: any) => file.belongs_to === 'assistant') || [],
-                    })
+            data.forEach((item: any) => {
+                newChatList.push({
+                    id: `question-${item.id}`,
+                    content: item.query,
+                    isAnswer: false,
+                    message_files: item.message_files?.filter((file: any) => file.belongs_to === 'user') || [],
                 })
-                setChatList(newChatList)
+                newChatList.push({
+                    id: item.id,
+                    content: item.answer,
+                    agent_thoughts: addFileInfos(item.agent_thoughts ? sortAgentSorts(item.agent_thoughts) : item.agent_thoughts, item.message_files),
+                    feedback: item.feedback,
+                    isAnswer: true,
+                    message_files: item.message_files?.filter((file: any) => file.belongs_to === 'assistant') || [],
+                })
             })
+            setChatList(newChatList)
         }
-        // For new conversation, the UI was already cleared in handleConversationIdChange.
-    }, [currConversationId, initialized])
+    }, [currConversationId, initialized, chatListData])
 } 

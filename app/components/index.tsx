@@ -220,11 +220,7 @@ const Main: FC<IMainProps> = () => {
     }
   }, [isAppParamsSuccess, appParams]);
 
-  useEffect(() => {
-    if (isConversationsError) {
-      console.error('Error fetching conversations');
-    }
-  }, [isConversationsError]);
+
 
   useEffect(() => {
     if (isAppParamsError) {
@@ -504,7 +500,8 @@ ${conversationSummary}`
           return
         }
         // not support show citation
-        // responseItem.citation = messageEnd.retriever_resources
+        const citation = messageEnd.metadata.retriever_resources
+        console.log("responseItem.citation", citation)
         const newListWithAnswer = produce(
           getChatList().filter(item => item.id !== responseItem.id && item.id !== placeholderAnswerId),
           (draft) => {
