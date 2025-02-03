@@ -20,9 +20,9 @@ import { replaceVarWithValues, userInputsFormToPromptVariables } from '@/utils/p
 import AppUnavailable from '@/app/components/app-unavailable'
 import { API_KEY, APP_ID, APP_INFO, isShowPrompt, promptTemplate } from '@/config'
 import type { Annotation as AnnotationType } from '@/types/log'
-import { addFileInfos, sortAgentSorts } from '@/utils/tools'
+
 import { useQuery } from '@tanstack/react-query'
-import { useConversationSwitch } from '@/app/hooks/use-conversation-switch'
+import { useConversationSwitch } from '@/hooks/use-conversation-switch'
 
 export type IMainProps = {
   params: any
