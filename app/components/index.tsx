@@ -151,7 +151,7 @@ const Main: FC<IMainProps> = () => {
     if (id === '-1') {
       createNewChat();
       // Immediately clear UI and set opening statement for new conversation
-      setChatList(generateNewChatListWithOpenStatement('', currInputs || {}));
+      setChatList(generateNewChatListWithOpenStatement(conversationIntroduction, newConversationInputs || {}));
     }
     setCurrConversationId(id, APP_ID);
   };
@@ -212,60 +212,69 @@ const Main: FC<IMainProps> = () => {
     return [aiGreetingMessage, ...(calculatedIntroduction ? [openingStatement] : [])];
   };
 
-  // init
   useEffect(() => {
     if (!hasSetAppConfig) {
-      setAppUnavailable(true)
-      return
+      setAppUnavailable(true);
+      return;
     }
+
     (async () => {
       try {
-        const [conversationData, appParams] = await Promise.all([fetchConversations(), fetchAppParams()])
+        const [conversationData, appParams] = await Promise.all([fetchConversations(), fetchAppParams()]);
+        const { data: conversations, error } = conversationData as { data: ConversationItem[]; error: string };
 
-        // handle current conversation id
-        const { data: conversations, error } = conversationData as { data: ConversationItem[]; error: string }
         if (error) {
-          Toast.notify({ type: 'error', message: error })
-          throw new Error(error)
+          Toast.notify({ type: 'error', message: error });
+          throw new Error(error);
         }
-        const _conversationId = getConversationIdFromStorage(APP_ID)
-        const isNotNewConversation = conversations.some(item => item.id === _conversationId)
 
-        // fetch new conversation info
-        const { user_input_form, opening_statement: introduction, file_upload, system_parameters }: any = appParams
-        setLocaleOnClient(APP_INFO.default_language, true)
+        setConversationList(conversations);
+
+        if (conversations.length === 0) {
+          // Ensure state updates before proceeding
+          setTimeout(() => {
+
+            handleConversationIdChange('-1'); // Ensures UI updates properly
+
+          }, 0);
+        } else {
+          const _conversationId = getConversationIdFromStorage(APP_ID);
+          const isNotNewConversation = conversations.some(item => item.id === _conversationId);
+
+          if (isNotNewConversation) {
+            setCurrConversationId(_conversationId, APP_ID, false);
+          }
+        }
+
+        // Fetch new conversation info
+        const { user_input_form, opening_statement: introduction, file_upload, system_parameters }: any = appParams;
+        setLocaleOnClient(APP_INFO.default_language, true);
         setNewConversationInfo({
           name: t('app.chat.newChatDefaultName'),
           introduction,
-        })
-        const prompt_variables = userInputsFormToPromptVariables(user_input_form)
+        });
+        const prompt_variables = userInputsFormToPromptVariables(user_input_form);
         setPromptConfig({
           prompt_template: promptTemplate,
           prompt_variables,
-        } as PromptConfig)
+        } as PromptConfig);
         setVisionConfig({
           ...file_upload?.image,
           image_file_size_limit: system_parameters?.system_parameters || 0,
-        })
-        setConversationList(conversations as ConversationItem[])
+        });
 
-        if (isNotNewConversation)
-          setCurrConversationId(_conversationId, APP_ID, false)
-
-        setInitialized(true)
-      }
-      catch (e: any) {
+        setInitialized(true);
+      } catch (e: any) {
         if (e.status === 404) {
-          setAppUnavailable(true)
-        }
-        else {
-          setIsUnknownReason(true)
-          setAppUnavailable(true)
+          setAppUnavailable(true);
+        } else {
+          setIsUnknownReason(true);
+          setAppUnavailable(true);
         }
       }
-    })()
+    })();
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [])
+  }, []);
 
   const [isResponding, { setTrue: enableResponding, setFalse: setRespondingFalse }] = useBoolean(false)
   const [_abortController, setAbortController] = useState<AbortController | null>(null)
@@ -599,7 +608,39 @@ ${conversationSummary}`
       },
     })
   }
+  async function handleDeleteConversation(conversationId: string) {
+    try {
+      const response = await fetch(`/api/conversations/${conversationId}/delete`, {
+        method: 'DELETE',
+      });
 
+      if (!response.ok) {
+        throw new Error("Failed to delete conversation");
+      }
+
+      const newConversationList = conversationList.filter(item => item.id !== conversationId);
+      setConversationList(newConversationList);
+
+      notify({ type: 'success', message: t('common.api.delete') });
+
+      // If all conversations are deleted, create a new one
+      if (newConversationList.length === 0) {
+        console.log("All conversations deleted. Creating a new one...");
+        setTimeout(() => {
+
+          console.log("New chat should be created, handling conversation change...");
+          handleConversationIdChange('-1'); // Ensure UI updates properly
+        }, 0);
+      } else {
+        // If there are still conversations left, switch to the most recent one
+        const latestConversation = newConversationList[0];
+        setCurrConversationId(latestConversation.id, APP_ID);
+      }
+    } catch (error) {
+      console.error("Error deleting conversation:", error);
+      notify({ type: 'error', message: t('common.api.error') });
+    }
+  }
   const handleFeedback = async (messageId: string, feedback: Feedbacktype) => {
     await updateFeedback({ url: `/messages/${messageId}/feedbacks`, body: { rating: feedback.rating } })
     const newChatList = chatList.map((item) => {
@@ -628,6 +669,7 @@ ${conversationSummary}`
           onCurrentIdChange={handleConversationIdChange}
           currentId={currConversationId}
           copyRight={APP_INFO.copyright || APP_INFO.title}
+          deleteConversation={(id) => handleDeleteConversation(id)}
         />
       </div>
     )

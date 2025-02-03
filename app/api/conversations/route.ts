@@ -4,8 +4,11 @@ import { client, getInfo, setSession } from '@/app/api/utils/common'
 
 export async function GET(request: NextRequest) {
   const { sessionId, user } = getInfo(request)
+
+  // get limit from query string
+  const limit = parseInt(request.nextUrl.searchParams.get('limit') || '10', 10)
   try {
-    const { data }: any = await client.getConversations(user)
+    const { data }: any = await client.getConversations(user, limit)
     return NextResponse.json(data, {
       headers: setSession(sessionId),
     })
