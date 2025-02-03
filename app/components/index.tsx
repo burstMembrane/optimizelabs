@@ -53,7 +53,7 @@ const Main: FC<IMainProps> = () => {
 
   // Add these near the other state declarations
   const [messageCounter, setMessageCounter] = useState<number>(0)
-  const MESSAGES_BEFORE_RENAME = 2 // You can adjust this number as needed
+  const MESSAGES_BEFORE_RENAME = 3 // You can adjust this number as needed
 
   useEffect(() => {
     if (APP_INFO?.title)
@@ -580,6 +580,11 @@ ${conversationSummary}`
   }
   async function handleDeleteConversation(conversationId: string) {
     try {
+      // get the last conversation, the one before the current one
+      const currentConversationIndex = conversationList.findIndex(item => item.id === currConversationId);
+      const lastConversation = conversationList[currentConversationIndex - 1];
+      setCurrConversationId(lastConversation.id, APP_ID);
+
       const response = await fetch(`/api/conversations/${conversationId}/delete`, {
         method: 'DELETE',
       });
