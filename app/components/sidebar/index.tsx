@@ -3,7 +3,7 @@ import type { FC } from 'react'
 import { useTranslation } from 'react-i18next'
 
 // import chat buttons from lucide-react
-import { MessageCircle, MessageCircleDashed } from 'lucide-react'
+import { Trash } from 'lucide-react'
 import type { ConversationItem } from '@/types/app'
 
 function classNames(...classes: any[]) {
@@ -34,8 +34,9 @@ const Sidebar: FC<ISidebarProps> = ({
     >
       <nav className="mt-4 flex-1 space-y-1 bg-white p-4 !pt-0">
         <p className="text-gray-400 text-xs px-2 font-normal">{t('conversations')}</p>
-        {list.map((item) => {
+        {list.slice(0, MAX_CONVERSATION_LENGTH).map((item, index) => {
           const isCurrent = item.id === currentId
+          const isFirstConversation = index === 0
 
           return (
             <div
@@ -49,6 +50,10 @@ const Sidebar: FC<ISidebarProps> = ({
               )}
             >
               <span className="truncate">{item.name}</span>
+
+              {!isFirstConversation && (
+                <Trash className="w-4 h-4 ml-auto text-gray-50 hover:text-gray-700" onClick={() => deleteConversation(item.id)} />
+              )}
             </div>
           )
         })}
@@ -62,4 +67,3 @@ const Sidebar: FC<ISidebarProps> = ({
 }
 
 export default React.memo(Sidebar)
-

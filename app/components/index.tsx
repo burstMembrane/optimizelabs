@@ -618,23 +618,21 @@ ${conversationSummary}`
         throw new Error("Failed to delete conversation");
       }
 
+      // Create new list before modifying state
       const newConversationList = conversationList.filter(item => item.id !== conversationId);
       setConversationList(newConversationList);
 
       notify({ type: 'success', message: t('common.api.delete') });
 
-      // If all conversations are deleted, create a new one
-      if (newConversationList.length === 0) {
-        console.log("All conversations deleted. Creating a new one...");
-        setTimeout(() => {
-
-          console.log("New chat should be created, handling conversation change...");
-          handleConversationIdChange('-1'); // Ensure UI updates properly
-        }, 0);
-      } else {
-        // If there are still conversations left, switch to the most recent one
-        const latestConversation = newConversationList[0];
-        setCurrConversationId(latestConversation.id, APP_ID);
+      // If deleted current conversation, handle switching
+      if (conversationId === currConversationId) {
+        if (newConversationList.length === 0) {
+          // If no conversations left, create new chat
+          handleConversationIdChange('-1');
+        } else {
+          // Switch to first available conversation
+          setCurrConversationId(newConversationList[0].id, APP_ID);
+        }
       }
     } catch (error) {
       console.error("Error deleting conversation:", error);

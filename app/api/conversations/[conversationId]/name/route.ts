@@ -1,7 +1,7 @@
 import { type NextRequest } from 'next/server'
 import { NextResponse } from 'next/server'
 import { client, getInfo } from '@/app/api/utils/common'
-import { generateConversationName } from '../../../../../service/index';
+
 
 export async function POST(request: NextRequest, { params }: {
   params: { conversationId: string, name: string }
