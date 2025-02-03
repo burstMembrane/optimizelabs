@@ -2,6 +2,15 @@
 All notable changes to this project will be documented in this file. See [conventional commits](https://www.conventionalcommits.org/) for commit guidelines.
 
 - - -
+## 0.0.4 - 2025-02-03
+#### Bug Fixes
+- message box disappearing - (7740709) - Liam Power
+- text justication - (64546db) - Liam Power
+#### Features
+- delete chats - (d5d765e) - Liam Power
+
+- - -
+
 ## 0.0.3 - 2025-02-02
 #### Bug Fixes
 - sidebar fixed width - (b00f574) - Liam Power
