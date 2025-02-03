@@ -21,6 +21,7 @@ import AppUnavailable from '@/app/components/app-unavailable'
 import { API_KEY, APP_ID, APP_INFO, isShowPrompt, promptTemplate } from '@/config'
 import type { Annotation as AnnotationType } from '@/types/log'
 import { addFileInfos, sortAgentSorts } from '@/utils/tools'
+import { useQuery } from '@tanstack/react-query'
 
 export type IMainProps = {
   params: any
@@ -51,7 +52,7 @@ const Main: FC<IMainProps> = () => {
 
   // Add these near the other state declarations
   const [messageCounter, setMessageCounter] = useState<number>(0)
-  const MESSAGES_BEFORE_RENAME = 3 // You can adjust this number as needed
+  const MESSAGES_BEFORE_RENAME = 2 // You can adjust this number as needed
 
   useEffect(() => {
     if (APP_INFO?.title)
@@ -212,69 +213,80 @@ const Main: FC<IMainProps> = () => {
     return [aiGreetingMessage, ...(calculatedIntroduction ? [openingStatement] : [])];
   };
 
-  useEffect(() => {
-    if (!hasSetAppConfig) {
-      setAppUnavailable(true);
-      return;
+  const fetchUserConversations = async () => {
+    const res = await fetchConversations();
+    const { data, error } = res as { data: ConversationItem[]; error: string };
+    if (error) {
+      Toast.notify({ type: 'error', message: error });
+      return [];
     }
+    return data;
+  };
 
-    (async () => {
-      try {
-        const [conversationData, appParams] = await Promise.all([fetchConversations(), fetchAppParams()]);
-        const { data: conversations, error } = conversationData as { data: ConversationItem[]; error: string };
+  const fetchAppParameters = async () => {
+    const res = await fetchAppParams();
+    if (res.error) {
+      throw new Error('Error fetching app params');
+    }
+    return res;
+  };
 
-        if (error) {
-          Toast.notify({ type: 'error', message: error });
-          throw new Error(error);
-        }
+  // Use useQuery for fetching user conversations
+  const { data: conversations, isError: isConversationsError, isSuccess: isConversationsSuccess } = useQuery({
+    queryKey: ['conversations'],
+    queryFn: fetchUserConversations,
+    staleTime: 60000,
+  });
 
-        setConversationList(conversations);
+  // Use useQuery for fetching app parameters
+  const { data: appParams, isError: isAppParamsError, isSuccess: isAppParamsSuccess } = useQuery({
+    queryKey: ['appParams'],
+    queryFn: fetchAppParameters,
+    staleTime: 60000,
+  });
 
-        if (conversations.length === 0) {
-          // Ensure state updates before proceeding
-          setTimeout(() => {
-
-            handleConversationIdChange('-1'); // Ensures UI updates properly
-
-          }, 0);
-        } else {
-          const _conversationId = getConversationIdFromStorage(APP_ID);
-          const isNotNewConversation = conversations.some(item => item.id === _conversationId);
-
-          if (isNotNewConversation) {
-            setCurrConversationId(_conversationId, APP_ID, false);
-          }
-        }
-
-        // Fetch new conversation info
-        const { user_input_form, opening_statement: introduction, file_upload, system_parameters }: any = appParams;
-        setLocaleOnClient(APP_INFO.default_language, true);
-        setNewConversationInfo({
-          name: t('app.chat.newChatDefaultName'),
-          introduction,
-        });
-        const prompt_variables = userInputsFormToPromptVariables(user_input_form);
-        setPromptConfig({
-          prompt_template: promptTemplate,
-          prompt_variables,
-        } as PromptConfig);
-        setVisionConfig({
-          ...file_upload?.image,
-          image_file_size_limit: system_parameters?.system_parameters || 0,
-        });
-
-        setInitialized(true);
-      } catch (e: any) {
-        if (e.status === 404) {
-          setAppUnavailable(true);
-        } else {
-          setIsUnknownReason(true);
-          setAppUnavailable(true);
-        }
+  // Handle success and error states
+  useEffect(() => {
+    if (isConversationsSuccess && conversations) {
+      setConversationList(conversations);
+      if (conversations.length === 0) {
+        setTimeout(() => { handleConversationIdChange('-1') }, 0);
+      } else {
+        const _conversationId = getConversationIdFromStorage(APP_ID);
+        if (conversations.some(item => item.id === _conversationId))
+          setCurrConversationId(_conversationId, APP_ID, false);
       }
-    })();
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
+    }
+  }, [isConversationsSuccess, conversations]);
+
+  useEffect(() => {
+    if (isAppParamsSuccess && appParams) {
+      const { user_input_form, opening_statement, file_upload, system_parameters } = appParams;
+      setLocaleOnClient(APP_INFO.default_language, true);
+      setNewConversationInfo({ name: t('app.chat.newChatDefaultName'), introduction: opening_statement });
+      const prompt_variables = userInputsFormToPromptVariables(user_input_form);
+      setPromptConfig({ prompt_template: promptTemplate, prompt_variables });
+      setVisionConfig({
+        ...file_upload?.image,
+        image_file_size_limit: system_parameters?.system_parameters || 0,
+      });
+      setInitialized(true);
+    }
+  }, [isAppParamsSuccess, appParams]);
+
+  useEffect(() => {
+    if (isConversationsError) {
+      console.error('Error fetching conversations');
+    }
+  }, [isConversationsError]);
+
+  useEffect(() => {
+    if (isAppParamsError) {
+      console.error('Error fetching app params');
+      setIsUnknownReason(true);
+      setAppUnavailable(true);
+    }
+  }, [isAppParamsError]);
 
   const [isResponding, { setTrue: enableResponding, setFalse: setRespondingFalse }] = useBoolean(false)
   const [_abortController, setAbortController] = useState<AbortController | null>(null)
